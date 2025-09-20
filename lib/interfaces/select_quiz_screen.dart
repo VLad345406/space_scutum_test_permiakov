@@ -1,5 +1,11 @@
 import 'package:flutter/material.dart';
 import 'task_screen.dart';
+import 'package:space_scutum_test_permiakov/quizzes/art_quiz.dart';
+import 'package:space_scutum_test_permiakov/quizzes/car_quiz.dart';
+import 'package:space_scutum_test_permiakov/quizzes/city_quiz.dart';
+import 'package:space_scutum_test_permiakov/quizzes/it_quiz.dart';
+import 'dart:math';
+import 'package:space_scutum_test_permiakov/models/question.dart';
 
 class SelectQuizScreen extends StatelessWidget {
   SelectQuizScreen({super.key});
@@ -12,11 +18,41 @@ class SelectQuizScreen extends StatelessWidget {
     {'title': 'Random', 'icon': 'assets/icons/random.png'},
   ];
 
+  List<Question> getRandomQuestions(int count) {
+    final allQuestions = [
+      ...artQuestions,
+      ...carQuestions,
+      ...cityQuestions,
+      ...itQuestions,
+    ];
+    final tempList = List<Question>.from(allQuestions);
+    final random = Random();
+    final selectedQuestions = <Question>[];
+
+    for (int i = 0; i < count && tempList.isNotEmpty; i++) {
+      final index = random.nextInt(tempList.length);
+      selectedQuestions.add(tempList[index]);
+      tempList.removeAt(index);
+    }
+
+    return selectedQuestions;
+  }
+
   void _onQuizTap(BuildContext context, String title) {
+    List<Question>? randomQuestions;
+    if (title == 'Random') {
+      randomQuestions = getRandomQuestions(5);
+    }
+
     Navigator.pushAndRemoveUntil(
       context,
-      MaterialPageRoute(builder: (context) => TaskScreen(quizType: title)),
-      (route) => false,
+      MaterialPageRoute(
+        builder: (context) => TaskScreen(
+          quizType: title,
+          randomQuestions: randomQuestions,
+        ),
+      ),
+          (route) => false,
     );
   }
 
@@ -38,10 +74,7 @@ class SelectQuizScreen extends StatelessWidget {
               borderRadius: BorderRadius.circular(12),
               onTap: () => _onQuizTap(context, option['title']!),
               child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 10,
-                ),
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                 child: Row(
                   children: [
                     Image.asset(option['icon']!, width: 80, height: 80),
@@ -49,10 +82,7 @@ class SelectQuizScreen extends StatelessWidget {
                     Expanded(
                       child: Text(
                         option['title']!,
-                        style: const TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.w500,
-                        ),
+                        style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
                       ),
                     ),
                   ],

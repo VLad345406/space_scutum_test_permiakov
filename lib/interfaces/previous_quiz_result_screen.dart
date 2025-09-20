@@ -11,38 +11,40 @@ class PreviousQuizResultScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final history = context.watch<ProviderState>().history;
+    final reversedHistory = history.reversed.toList();
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('Previous quizzes'),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.delete),
-            onPressed: () async {
-              final confirm = await showDialog<bool>(
-                context: context,
-                builder: (ctx) => AlertDialog(
-                  title: const Text('Clear history?'),
-                  content: const Text(
-                    'Are you sure you want to delete all saved quiz results?',
+          if (history.isNotEmpty)
+            IconButton(
+              icon: const Icon(Icons.delete),
+              onPressed: () async {
+                final confirm = await showDialog<bool>(
+                  context: context,
+                  builder: (ctx) => AlertDialog(
+                    title: const Text('Clear history?'),
+                    content: const Text(
+                      'Are you sure you want to delete all saved quiz results?',
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(ctx, false),
+                        child: const Text('No'),
+                      ),
+                      TextButton(
+                        onPressed: () => Navigator.pop(ctx, true),
+                        child: const Text('Yes'),
+                      ),
+                    ],
                   ),
-                  actions: [
-                    TextButton(
-                      onPressed: () => Navigator.pop(ctx, false),
-                      child: const Text('No'),
-                    ),
-                    TextButton(
-                      onPressed: () => Navigator.pop(ctx, true),
-                      child: const Text('Yes'),
-                    ),
-                  ],
-                ),
-              );
-              if (confirm == true) {
-                await context.read<ProviderState>().clearHistory();
-              }
-            },
-          ),
+                );
+                if (confirm == true) {
+                  await context.read<ProviderState>().clearHistory();
+                }
+              },
+            ),
         ],
       ),
       body: history.isEmpty
@@ -53,9 +55,9 @@ class PreviousQuizResultScreen extends StatelessWidget {
               ),
             )
           : ListView.builder(
-              itemCount: history.length,
+              itemCount: reversedHistory.length,
               itemBuilder: (context, index) {
-                final QuizResult result = history[index];
+                final QuizResult result = reversedHistory[index];
                 final correctAnswers = result.questions
                     .where((q) => q.selectAnswer == q.correctIndex)
                     .length;
