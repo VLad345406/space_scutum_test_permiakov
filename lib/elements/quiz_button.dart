@@ -19,9 +19,15 @@ class QuizButton extends StatelessWidget {
           backgroundColor: WidgetStateProperty.all(Colors.amber),
         ),
         onPressed: function,
-        child: Text(
-          buttonText,
-          style: GoogleFonts.aBeeZee(fontSize: 25, color: Colors.black),
+        child: Container(
+          constraints: BoxConstraints(
+            minWidth: 160,
+          ),
+          child: Text(
+            buttonText,
+            textAlign: TextAlign.center,
+            style: GoogleFonts.aBeeZee(fontSize: 25, color: Colors.black),
+          ),
         ),
       ),
     );
